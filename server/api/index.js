@@ -1,9 +1,9 @@
-import express from 'express';
+import express from "express";
 
-import { initializeApp } from 'firebase/app';
-import { getDatabase, ref, onValue, set } from 'firebase/database';
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import config from './config.js';
+import { initializeApp } from "firebase/app";
+import { getDatabase, ref, onValue, set } from "firebase/database";
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import config from "./config.js";
 
 const firebaseConfig = config.firebaseConfig;
 
@@ -17,7 +17,7 @@ const db = getDatabase(app);
 
 const exServer = express();
 
-exServer.get('/', function (req, res) {
+exServer.get("/", function (req, res) {
   if (req.query.set !== undefined) {
     if (req.query.hash !== config.hash.write) {
       res.sendStatus(403);
