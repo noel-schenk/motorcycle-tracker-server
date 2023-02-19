@@ -45,6 +45,4 @@ exServer.get('/', function (req, res) {
   res.sendStatus(404);
 });
 
-exServer.listen(4200);
-
 export default exServer;
