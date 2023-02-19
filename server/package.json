@@ -1,6 +1,5 @@
 {
   "name": "motorcycle-tracker-server",
-  "type": "module",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
