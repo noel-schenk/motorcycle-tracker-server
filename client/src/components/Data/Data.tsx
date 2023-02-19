@@ -7,9 +7,7 @@ import styles from './Data.module.scss';
 interface DataProps {}
 
 const Data: FC<DataProps> = () => {
-  const [location, setLocation] = useState('');
-  const [accuracy, setAccuracy] = useState('');
-  const [speed, setSpeed] = useState('');
+  const [location, setLocation] = useState({} as any);
   const [picture, setPicture] = useState('');
   const [battery, setBattery] = useState('');
   const [armed, setArmed] = useState('');
@@ -21,16 +19,15 @@ const Data: FC<DataProps> = () => {
   useEffect(() => {
     const on = (item: string, cb: any) =>
       onValue(ref(db, item), (data) => {
+        console.log(data, 'data');
         cb(data.val());
       });
 
-    on('location', setLocation);
-    on('accuracy', setAccuracy);
-    on('speed', setSpeed);
+    on('location', (val: any) => setLocation(JSON.parse(val)));
     on('picture', setPicture);
     on('battery', setBattery);
     on('armed', setArmed);
-  }, [setLocation, setAccuracy, setSpeed, setPicture, setBattery, setArmed]);
+  }, [setLocation, setPicture, setBattery, setArmed]);
 
   useEffect(() => {
     setMapURL(getMapURL(location));
@@ -41,13 +38,17 @@ const Data: FC<DataProps> = () => {
       <Typography component="h1" variant="h5">
         Find my Motorcycle Data:
       </Typography>
+
+      <img
+        src={`data:image/jpeg;charset=utf-8;base64, ${decodeURI(picture)}`}
+      />
+
       <iframe className={styles.DataIframe} src={mapURL}></iframe>
 
       <Typography component="p">
-        Location: [{location}]<br />
-        Accuracy: [{accuracy}]<br />
-        Speed: [{speed}]<br />
-        Picture: [{picture}]<br />
+        Location: [{JSON.stringify(location)}]<br />
+        Accuracy: [{JSON.stringify(location?.accuracy)}]<br />
+        Speed: [{JSON.stringify(location?.speed)}]<br />
         Battery: [{battery}]<br />
         Armed: [{armed}]
       </Typography>
@@ -57,11 +58,6 @@ const Data: FC<DataProps> = () => {
 
 export default Data;
 
-const getMapURL = (location: string) => {
-  let parsedLocation;
-  try {
-    parsedLocation = JSON.parse(location);
-  } catch (error) {}
-
-  return `https://maps.google.com/maps?q=${parsedLocation?.lat},${parsedLocation?.long}&output=embed`;
+const getMapURL = (location: any) => {
+  return `https://maps.google.com/maps?q=${location?.lat},${location?.long}&output=embed`;
 };
