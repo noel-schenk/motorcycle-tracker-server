@@ -5,8 +5,6 @@ import { getDatabase, ref, onValue, set } from 'firebase/database';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import config from './config.js';
 
-console.log(config);
-
 const firebaseConfig = config.firebaseConfig;
 
 const app = initializeApp(firebaseConfig);
@@ -48,3 +46,5 @@ exServer.get('/', function (req, res) {
 });
 
 exServer.listen(4200);
+
+export default exServer;
