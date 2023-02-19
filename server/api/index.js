@@ -1,4 +1,6 @@
-const app = require("express")();
+import express from "express";
+
+const app = express();
 
 app.get("/api", (req, res) => {
   const path = `/api/item/test`;
@@ -12,4 +14,4 @@ app.get("/api/item/:slug", (req, res) => {
   res.end(`Item: ${slug}`);
 });
 
-module.exports = app;
+export default app;
