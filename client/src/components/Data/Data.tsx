@@ -14,6 +14,8 @@ const Data: FC<DataProps> = () => {
   const [battery, setBattery] = useState('');
   const [armed, setArmed] = useState('');
 
+  const [mapURL, setMapURL] = useState('');
+
   const db = useDatabase.getState().db as Database;
 
   useEffect(() => {
@@ -28,13 +30,19 @@ const Data: FC<DataProps> = () => {
     on('picture', setPicture);
     on('battery', setBattery);
     on('armed', setArmed);
-  }, []);
+  }, [setLocation, setAccuracy, setSpeed, setPicture, setBattery, setArmed]);
+
+  useEffect(() => {
+    setMapURL(getMapURL(location));
+  }, [location]);
 
   return (
     <div className={styles.Data}>
       <Typography component="h1" variant="h5">
         Find my Motorcycle Data:
       </Typography>
+      <iframe className={styles.DataIframe} src={mapURL}></iframe>
+
       <Typography component="p">
         Location: [{location}]<br />
         Accuracy: [{accuracy}]<br />
@@ -48,3 +56,12 @@ const Data: FC<DataProps> = () => {
 };
 
 export default Data;
+
+const getMapURL = (location: string) => {
+  let parsedLocation;
+  try {
+    parsedLocation = JSON.parse(location);
+  } catch (error) {}
+
+  return `https://maps.google.com/maps?q=${parsedLocation?.lat},${parsedLocation?.long}&output=embed`;
+};

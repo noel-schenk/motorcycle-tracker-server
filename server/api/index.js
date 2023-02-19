@@ -25,8 +25,6 @@ exServer.get("/api", function (req, res) {
     }
 
     set(ref(db, req.query.key), req.query.value);
-    res.send();
-    return;
   }
 
   if (req.query.get !== undefined) {
@@ -38,11 +36,9 @@ exServer.get("/api", function (req, res) {
     const refValue = ref(db, req.query.key);
     onValue(refValue, (data) => {
       res.send(data.val());
+      return;
     });
-    return;
   }
-
-  res.sendStatus(404);
 });
 
 export default exServer;
