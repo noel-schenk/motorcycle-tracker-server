@@ -17,7 +17,7 @@ const db = getDatabase(app);
 
 const exServer = express();
 
-exServer.get("/", function (req, res) {
+exServer.get("/api", function (req, res) {
   if (req.query.set !== undefined) {
     if (req.query.hash !== config.hash.write) {
       res.sendStatus(403);
