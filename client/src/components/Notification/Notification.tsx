@@ -32,7 +32,7 @@ const Notification: FC<NotificationProps> = () => {
         console.log('Registered push');
 
         console.log('Register subscription');
-        await fetch(`${config.server.baseURL}/subscribe`, {
+        await fetch(`${config.server.baseURL}/api?subscribe`, {
           method: 'POST',
           body: JSON.stringify(subscription),
           headers: {
