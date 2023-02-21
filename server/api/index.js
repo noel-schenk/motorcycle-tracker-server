@@ -113,9 +113,19 @@ const listenForNotificationRegistration = (exServer, db) => {
     const subscriptionKey = endpointBuffer.toString("base64");
     const subscriptionPath = `endpoints/${subscriptionKey}`;
     const subscriptionRef = ref(db, subscriptionPath);
-    set(subscriptionRef, subscription);
+    set(subscriptionRef, subscription)
+      .then(() => {
+        console.log("database set done successfully");
+      })
+      .catch((error) => {
+        console.log("database error", error);
+      });
 
-    console.log("database set done");
+    console.log(
+      "database set done with data:",
+      JSON.stringify(subscriptionPath),
+      JSON.stringify(subscription)
+    );
   };
 };
 
