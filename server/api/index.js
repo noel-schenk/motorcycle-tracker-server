@@ -30,8 +30,17 @@ export const checkAuth = (req) => {
   return true;
 };
 
+export const listenForURL = (exServer, db) => {
+  const _listenForAPI = listenForAPI(exServer, db);
+  const _listenForNotifications = listenForNotifications(exServer, db);
+  exServer.all("/api", (req, res) => {
+    _listenForAPI(req, res);
+    _listenForNotifications(req, res);
+  });
+};
+
 export const listenForAPI = (exServer, db) => {
-  exServer.get("/api", function (req, res) {
+  return (req, res) => {
     if (!checkAuth(req)) return;
 
     if (req.query.notify !== undefined) {
@@ -58,7 +67,7 @@ export const listenForAPI = (exServer, db) => {
         return;
       });
     }
-  });
+  };
 };
 
 const listenForNotifications = (exServer, db) => {
@@ -70,7 +79,7 @@ const listenForNotifications = (exServer, db) => {
 
   exServer.use(bodyParser.json());
 
-  exServer.all("/api", (req, res) => {
+  return (req, res) => {
     if (req.query.subscribe === undefined) {
       return;
     }
@@ -91,7 +100,7 @@ const listenForNotifications = (exServer, db) => {
     const subscriptionPath = `endpoints/${subscriptionKey}`;
     const subscriptionRef = ref(db, subscriptionPath);
     set(subscriptionRef, subscription);
-  });
+  };
 };
 
 const sendNotification = (db, payloadData) => {
@@ -116,8 +125,6 @@ const exServer = express();
 
 const db = await initDatabase();
 
-listenForNotifications(exServer, db);
-
-listenForAPI(exServer, db);
+listenForURL(exServer, db);
 
 export default exServer;
