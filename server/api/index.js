@@ -80,10 +80,6 @@ const listenForNotifications = (exServer, db) => {
   exServer.use(bodyParser.json());
 
   return (req, res) => {
-    if (req.query.subscribe === undefined) {
-      return;
-    }
-
     res.setHeader("Access-Control-Allow-Origin", config.client.baseURL);
     res.header("Access-Control-Allow-Headers", "*");
 
