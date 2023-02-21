@@ -22,9 +22,8 @@ export const initDatabase = async () => {
   return getDatabase(app);
 };
 
-export const checkAuth = (req, res) => {
+export const checkAuth = (req) => {
   if (req.query.hash !== config.hash.write) {
-    res.sendStatus(403);
     return false;
   }
   return true;
