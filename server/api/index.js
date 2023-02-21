@@ -45,6 +45,8 @@ export const listenForAPI = (exServer, db) => {
   return (req, res) => {
     if (!checkAuth(req, res)) return;
 
+    console.log("auth check OK", req.query);
+
     if (req.query.notify !== undefined) {
       sendNotification(
         db,
@@ -59,8 +61,10 @@ export const listenForAPI = (exServer, db) => {
     }
 
     if (req.query.set !== undefined) {
+      console.log("req query set", req.query.key, req.query.value);
       set(ref(db, req.query.key), req.query.value)
         .then(() => {
+          console.log("req send status 200 - OK");
           res.sendStatus(200);
         })
         .catch((error) => {
