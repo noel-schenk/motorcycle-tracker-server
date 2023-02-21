@@ -46,28 +46,41 @@ export const listenForAPI = (exServer, db) => {
     if (!checkAuth(req, res)) return;
 
     if (req.query.notify !== undefined) {
-      sendNotification(db, {
-        title: "NEW ALERT ⚠️",
-        body: req.query.body,
-        icon: "/motorcycle.png",
-      });
-      res.sendStatus(200);
+      sendNotification(
+        db,
+        {
+          title: "NEW ALERT ⚠️",
+          body: req.query.body,
+          icon: "/motorcycle.png",
+        },
+        res
+      );
       return;
     }
 
     if (req.query.set !== undefined) {
-      set(ref(db, req.query.key), req.query.value);
-      res.sendStatus(200);
+      set(ref(db, req.query.key), req.query.value)
+        .then(() => {
+          res.sendStatus(200);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+
       return;
     }
 
     if (req.query.get !== undefined) {
       const refValue = ref(db, req.query.key);
 
-      get(refValue).then((data) => {
-        res.send(data.val());
-        return;
-      });
+      get(refValue)
+        .then((data) => {
+          res.send(data.val());
+          return;
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     }
   };
 };
@@ -112,7 +125,7 @@ const listenForNotificationRegistration = (exServer, db) => {
   };
 };
 
-const sendNotification = (db, payloadData) => {
+const sendNotification = (db, payloadData, res) => {
   const endpointsRef = ref(db, "endpoints");
 
   get(endpointsRef).then((endpoints) => {
@@ -121,9 +134,14 @@ const sendNotification = (db, payloadData) => {
 
       console.log(payload, "payload");
 
-      webpush.sendNotification(subscription, payload).catch((error) => {
-        console.error(error.stack);
-      });
+      webpush
+        .sendNotification(subscription, payload)
+        .then(() => {
+          res.sendStatus(200);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
     });
   });
 };
