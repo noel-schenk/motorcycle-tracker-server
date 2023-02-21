@@ -73,7 +73,6 @@ export const listenForAPI = (exServer, db) => {
 };
 
 const listenForNotificationRegistration = (exServer, db) => {
-  console.log("listenForNotificationRegistration");
   webpush.setVapidDetails(
     "mailto:noreply@idhren.com",
     config.vapid.public,
@@ -83,29 +82,19 @@ const listenForNotificationRegistration = (exServer, db) => {
   exServer.use(bodyParser.json());
 
   return (req, res) => {
-    console.log(JSON.stringify(req.query));
     if (req.query.subscribe === undefined) {
       return;
     }
 
-    console.log(
-      'res.setHeader("Access-Control-Allow-Origin", config.client.baseURL)'
-    );
-
     res.setHeader("Access-Control-Allow-Origin", config.client.baseURL);
     res.header("Access-Control-Allow-Headers", "*");
-
-    console.log("send status");
 
     const subscription = req.body;
 
     if (!subscription.endpoint) {
       res.status(201).json({});
-      console.log("return & sent status");
       return;
     }
-
-    console.log("had endpoint", subscription.endpoint);
 
     // oneliner was unreadable
     const endpointBuffer = Buffer.from(subscription.endpoint);
@@ -114,18 +103,12 @@ const listenForNotificationRegistration = (exServer, db) => {
     const subscriptionRef = ref(db, subscriptionPath);
     set(subscriptionRef, subscription)
       .then(() => {
-        console.log("database set done successfully");
         res.status(201).json({});
       })
       .catch((error) => {
+        res.sendStatus(500);
         console.log("database error", error);
       });
-
-    console.log(
-      "database set done with data:",
-      JSON.stringify(subscriptionPath),
-      JSON.stringify(subscription)
-    );
   };
 };
 
