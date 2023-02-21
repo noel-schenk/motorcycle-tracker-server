@@ -42,13 +42,8 @@ export const listenForURL = (exServer, db) => {
 };
 
 export const listenForAPI = (exServer, db) => {
-  console.log("init listenForAPI");
   return (req, res) => {
-    console.log("checkAuth", req.query.hash, config.hash.write);
-    console.log(req.query.hash === config.hash.write);
     if (!checkAuth(req)) return;
-
-    console.log("auth check OK", req.query);
 
     if (req.query.notify !== undefined) {
       sendNotification(
@@ -64,10 +59,8 @@ export const listenForAPI = (exServer, db) => {
     }
 
     if (req.query.set !== undefined) {
-      console.log("req query set", req.query.key, req.query.value);
       set(ref(db, req.query.key), req.query.value)
         .then(() => {
-          console.log("req send status 200 - OK");
           res.sendStatus(200);
         })
         .catch((error) => {
@@ -127,7 +120,7 @@ const listenForNotificationRegistration = (exServer, db) => {
       })
       .catch((error) => {
         res.sendStatus(500);
-        console.log("database error", error);
+        console.error("database error", error);
       });
   };
 };
