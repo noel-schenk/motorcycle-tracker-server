@@ -1,44 +1,119 @@
 import express from "express";
 
 import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue, set } from "firebase/database";
+import { getDatabase, ref, set, get } from "firebase/database";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import config from "./config.js";
 
-const firebaseConfig = config.firebaseConfig;
+import webpush from "web-push";
+import bodyParser from "body-parser";
 
-const app = initializeApp(firebaseConfig);
+export const initDatabase = async () => {
+  const app = initializeApp(config.firebaseConfig);
 
-const auth = getAuth(app);
+  const auth = getAuth(app);
 
-await signInWithEmailAndPassword(auth, config.auth.email, config.auth.password);
+  await signInWithEmailAndPassword(
+    auth,
+    config.auth.email,
+    config.auth.password
+  );
 
-const db = getDatabase(app);
+  return getDatabase(app);
+};
+
+export const checkAuth = (req) => {
+  if (req.query.hash !== config.hash.write) {
+    res.sendStatus(403);
+    return false;
+  }
+  return true;
+};
+
+export const listenForAPI = (exServer, db) => {
+  exServer.get("/api", function (req, res) {
+    if (!checkAuth(req)) return;
+
+    if (req.query.notify !== undefined) {
+      sendNotification(db, {
+        title: "NEW ALERT ⚠️",
+        body: req.query.body,
+        icon: "/motorcycle.png",
+      });
+      res.sendStatus(200);
+      return;
+    }
+
+    if (req.query.set !== undefined) {
+      set(ref(db, req.query.key), req.query.value);
+      res.sendStatus(200);
+      return;
+    }
+
+    if (req.query.get !== undefined) {
+      const refValue = ref(db, req.query.key);
+
+      get(refValue).then((data) => {
+        res.send(data.val());
+        return;
+      });
+    }
+  });
+};
+
+const listenForNotifications = (exServer, db) => {
+  webpush.setVapidDetails(
+    "mailto:noreply@idhren.com",
+    config.vapid.public,
+    config.vapid.private
+  );
+
+  exServer.use(bodyParser.json());
+
+  exServer.all("/subscribe", (req, res) => {
+    res.setHeader("Access-Control-Allow-Origin", config.client.baseURL);
+    res.header("Access-Control-Allow-Headers", "*");
+
+    const subscription = req.body;
+    res.status(201).json({});
+
+    if (!subscription.endpoint) {
+      return;
+    }
+
+    // oneliner was unreadable
+    const endpointBuffer = Buffer.from(subscription.endpoint);
+    const subscriptionKey = endpointBuffer.toString("base64");
+    const subscriptionPath = `endpoints/${subscriptionKey}`;
+    const subscriptionRef = ref(db, subscriptionPath);
+    set(subscriptionRef, subscription);
+  });
+};
+
+const sendNotification = (db, payloadData) => {
+  const endpointsRef = ref(db, "endpoints");
+
+  get(endpointsRef).then((endpoints) => {
+    Object.values(endpoints.val()).forEach((subscription) => {
+      const payload = JSON.stringify(payloadData);
+
+      console.log(payload, "payload");
+
+      webpush.sendNotification(subscription, payload).catch((error) => {
+        console.error(error.stack);
+      });
+    });
+  });
+};
+
+// START SERVER
 
 const exServer = express();
 
-exServer.get("/api", function (req, res) {
-  if (req.query.set !== undefined) {
-    if (req.query.hash !== config.hash.write) {
-      res.sendStatus(403);
-      return;
-    }
+const db = await initDatabase();
 
-    set(ref(db, req.query.key), req.query.value);
-  }
+listenForNotifications(exServer, db);
 
-  if (req.query.get !== undefined) {
-    if (req.query.hash !== config.hash.read) {
-      res.sendStatus(403);
-      return;
-    }
-
-    const refValue = ref(db, req.query.key);
-    onValue(refValue, (data) => {
-      res.send(data.val());
-      return;
-    });
-  }
-});
+listenForAPI(exServer, db);
 
 export default exServer;

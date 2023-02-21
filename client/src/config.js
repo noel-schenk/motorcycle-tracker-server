@@ -9,8 +9,11 @@ export default {
     messagingSenderId: '196036965037',
     appId: '1:196036965037:web:6ebf577dfb08c86d230c24',
   },
-  auth: {
-    email: 'noel.schenk+read@outlook.com',
-    password: '0123456789',
+  vapid: {
+    public:
+      'BOmSAeUN7SWrJYUQOX3ofeDWVLIIuXF6DAqimqdr0yx7rKmIXGcqhDS9ISgIAbdbnmtXFLLW3m2pJ1B965Yr-fM',
+  },
+  server: {
+    baseURL: process.env.REACT_APP_SERVER_BASEURL,
   },
 };
