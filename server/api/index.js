@@ -98,11 +98,10 @@ const listenForNotificationRegistration = (exServer, db) => {
     console.log("send status");
 
     const subscription = req.body;
-    res.status(201).json({});
-
-    console.log("sent status");
 
     if (!subscription.endpoint) {
+      res.status(201).json({});
+      console.log("return & sent status");
       return;
     }
 
@@ -116,6 +115,7 @@ const listenForNotificationRegistration = (exServer, db) => {
     set(subscriptionRef, subscription)
       .then(() => {
         console.log("database set done successfully");
+        res.status(201).json({});
       })
       .catch((error) => {
         console.log("database error", error);
