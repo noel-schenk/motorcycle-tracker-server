@@ -23,10 +23,10 @@ export const initDatabase = async () => {
 };
 
 export const checkAuth = (req) => {
-  if (req.query.hash !== config.hash.write) {
-    return false;
+  if (req.query.hash === config.hash.write) {
+    return true;
   }
-  return true;
+  return false;
 };
 
 export const listenForURL = (exServer, db) => {
@@ -44,8 +44,8 @@ export const listenForURL = (exServer, db) => {
 export const listenForAPI = (exServer, db) => {
   console.log("init listenForAPI");
   return (req, res) => {
-    console.log("checkAuth", checkAuth(req, res));
-    if (!checkAuth(req, res)) return;
+    console.log("checkAuth", checkAuth(req), req, config.hash.write);
+    if (!checkAuth(req)) return;
 
     console.log("auth check OK", req.query);
 
