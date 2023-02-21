@@ -22,7 +22,7 @@ export const initDatabase = async () => {
   return getDatabase(app);
 };
 
-export const checkAuth = (req) => {
+export const checkAuth = (req, res) => {
   if (req.query.hash !== config.hash.write) {
     res.sendStatus(403);
     return false;
@@ -41,7 +41,7 @@ export const listenForURL = (exServer, db) => {
 
 export const listenForAPI = (exServer, db) => {
   return (req, res) => {
-    if (!checkAuth(req)) return;
+    if (!checkAuth(req, res)) return;
 
     if (req.query.notify !== undefined) {
       sendNotification(db, {
