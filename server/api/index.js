@@ -44,7 +44,8 @@ export const listenForURL = (exServer, db) => {
 export const listenForAPI = (exServer, db) => {
   console.log("init listenForAPI");
   return (req, res) => {
-    console.log("checkAuth", checkAuth(req), req, config.hash.write);
+    console.log("checkAuth", req.query.hash, req, config.hash.write);
+    console.log(req.query.hash === config.hash.write);
     if (!checkAuth(req)) return;
 
     console.log("auth check OK", req.query);
