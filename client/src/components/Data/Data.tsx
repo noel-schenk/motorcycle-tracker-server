@@ -56,6 +56,8 @@ const Data: FC<DataProps> = () => {
         <br />
         Speed: [⚡ {JSON.stringify(data?.speed)} km/h]
         <br />
+        Update: [🕒 {new Date(data?.epoch / 1).toString()}]
+        <br />
         Battery: [🔋 {data.battery}%]
         <br />
         Armed: [🪖 {data.armed}]<br />
