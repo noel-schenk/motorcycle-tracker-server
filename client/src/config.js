@@ -16,4 +16,7 @@ export default {
   server: {
     baseURL: process.env.REACT_APP_SERVER_BASEURL,
   },
+  tracker: {
+    phoneNumber: process.env.REACT_APP_PHONE_NUMBER,
+  },
 };

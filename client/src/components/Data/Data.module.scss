@@ -11,3 +11,13 @@
   width: 100%;
   height: 600px;
 }
+
+.DataText {
+  max-width: 100%;
+}
+
+.Actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-around;
+}
